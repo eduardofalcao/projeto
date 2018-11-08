@@ -18,6 +18,7 @@ export default class login extends Component {
       }).then ( result => {
             console.log(result)
             sessionStorage.setItem("token", result.data.token)
+            this.props.history.push("/chat")
       })
       .catch((err) => {
           console.log(err)

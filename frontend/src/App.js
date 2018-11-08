@@ -4,43 +4,41 @@ import Messaging from './messaging'
 import './App.css';
 import {Route, Link, Redirect} from 'react-router-dom';
 import Login from "./containers/login"
+import io from "socket.io-client";
+const socket = io("http://localhost:3001");
 
-function PrivateRoute({ component: Component, ...rest }) {
-  const token = sessionStorage.getItem("token")
-  return (
-    <Route
-      {...rest}
-      render={props =>
-        token ? (
-          <Component {...props} />
-        ) : (
-          <Redirect
-            to={{
-              pathname: "/login",
-              state: { from: props.location }
-            }}
-          />
-        )
-      }
-    />
-  );
-}
+
 
 
 class App extends Component {
+  componentDidMount() {
+    socket.on('connect', () => {
+      alert('Conectou ao backend')
+    });
+
+    socket.on('evento1', (data) => {
+      console.log("evento 1", data)
+
+      
+    })
+
+    setInterval(() => {
+      socket.emit("evento1", {data:"front"})
+    }, 10000)
+
+    
+    socket.on('disconnect', () => {
+      alert('Backend desconectado')
+    });
+  }
+
   render() {
     return (
       <div className="App">
-        {/* 2- links para as rotas*/ }
-        <Link to="/login">Login</Link>
-        <Link to="/chat">Chat</Link>
+       
         
         {/* 1- definicao de rota */}
-        <Route path="/login" component={Login}/>
-        <PrivateRoute path="/chat" component={Messaging}/>
-        <Redirect to="/login"/>
-        
-
+        <Messaging/>
         
       </div>      
     );

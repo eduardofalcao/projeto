@@ -13,18 +13,16 @@ app.use(express.json({ extended: true }));
 const cors = require("cors");
 app.use(cors()); //TODO - Mudar para que nao permita requisicoes de todos os servidores
 
+//socket
+const socketIo = require("socket.io");
+const http = require("http")
+
+var server = http.createServer(app);
+const io = socketIo(server);
+
 
 //routes
-function protectByToken (req, res, next) {
-  const autenticate = passport.authenticate ("jwt-string-secret", {session:false},
-    (err, user, info) => {
-      if (err || !user){
-        return res.status(403).json({...info});
-      }
-      return next();
-    })
-    autenticate(req, res,next);
-}
+const { protecByToken } = require('./midd/auth')
 
 
 // configuracao das strategias de exportacao
@@ -81,7 +79,7 @@ const authRouter = require("./routers/auth");
 const roomRouter = require("./routers/rooms");
 app.use("/users", userRouter);
 app.use("/auth", authRouter);
-app.use("/rooms", protectByToken, roomRouter);
+app.use("/rooms", roomRouter);
 var mongoose = require("mongoose");
 // mongo --host sigteste.sti.ufpb.br --port 5556 -u csiadmin -p 'c$!s3cret' --authenticationDatabase 'admin'
 mongoose.connect(
@@ -93,7 +91,26 @@ db.on("error", (a,b) => console.error("connection error:", a, b));
 db.once("open", function() {
   // we're connected!
   console.log("we're connected!");
-  app.listen(PORT, HOSTNAME, () => {
+
+  io.on('connection', () => {
+    console.log("Cliente conectado via socket")
+
+    socket.on("evento1", data => {
+      console.log(data)
+    })
+    
+    setInterval(() => {
+      socket.emit('evento1', {time: new Date()
+      }, 10000)
+    })
+
+    setInterval(() =>{
+      io.emit('evento1', {name: "ricardo"})
+    }, 20000)
+  })
+
+
+  server.listen(PORT, HOSTNAME, () => {
     console.log(`Server listning on ${HOSTNAME}:${PORT}`);
   });
 });

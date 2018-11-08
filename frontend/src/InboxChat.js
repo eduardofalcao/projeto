@@ -10,23 +10,30 @@ const instance = axios.create({
 });
 
 export default class InboxChat extends Component {
+
+    constuctor(props) {
+        this.state = {
+            roomSelectd: null, 
+            rooms: props.rooms
+        }
+    }
+
+    handleClick(room) {
+        this.setState({roomSelected: room})
+    }
+
     render() {
+        const {rooms } = this.state;
+
         return (
             <div class="inbox_chat">
-                <ChatPeople image="https://ptetutorials.com/images/user-profile.png" name="Sunil Rajput" date="Dec 25" 
-                            message="Test, which is a new approach to have all solutions astrology under one roof." active_chat="true" />
-                <ChatPeople image="https://ptetutorials.com/images/user-profile.png" name="Sunil Rajput" date="Dec 25" 
-                            message="Test, which is a new approach to have all solutions astrology under one roof."  />
-                <ChatPeople image="https://ptetutorials.com/images/user-profile.png" name="Sunil Rajput" date="Dec 25" 
-                            message="Test, which is a new approach to have all solutions astrology under one roof."  />
-                <ChatPeople image="https://ptetutorials.com/images/user-profile.png" name="Sunil Rajput" date="Dec 25" 
-                            message="Test, which is a new approach to have all solutions astrology under one roof."  />
-                <ChatPeople image="https://ptetutorials.com/images/user-profile.png" name="Sunil Rajput" date="Dec 25" 
-                            message="Test, which is a new approach to have all solutions astrology under one roof."  />
-                <ChatPeople image="https://ptetutorials.com/images/user-profile.png" name="Sunil Rajput" date="Dec 25" 
-                            message="Test, which is a new approach to have all solutions astrology under one roof."  />
-                <ChatPeople image="https://ptetutorials.com/images/user-profile.png" name="Sunil Rajput" date="Dec 25" 
-                            message="Test, which is a new approach to have all solutions astrology under one roof."  />
+                {rooms && rooms.map( room => {
+                   return <ChatPeople key = { room._id}
+                   room = {room}
+                    name = {room.name}
+                    active_chat={roomSelected && roomSelected._id === room._id}
+                    handleClick = {this.handleClick.bind(this)}/> 
+                })}
             </div>
         )
     }
